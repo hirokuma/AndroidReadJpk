@@ -7,11 +7,18 @@ import android.nfc.tech.IsoDep;
 import android.nfc.tech.NfcB;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blogpost.hiro99ma.nfc.NfcFactory;
 
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Primitive;
+import org.bouncycastle.asn1.util.ASN1Dump;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.Buffer;
 
@@ -23,6 +30,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        TextView tv = (TextView)findViewById(R.id.text_work);
+        assert tv != null;
+        tv.setMovementMethod(ScrollingMovementMethod.getInstance());
     }
 
     @Override
@@ -94,10 +105,18 @@ public class MainActivity extends AppCompatActivity {
                         p2 = (byte)(point & 0x00ff);
                     }
 
+                    // これと混ぜられないか
+                    // https://developers.google.com/identity/smartlock-passwords/android/overview
+                    ASN1InputStream asn1Stream = new ASN1InputStream(new ByteArrayInputStream(crt));
+                    final ASN1Primitive prim = asn1Stream.readObject();
+
                     nfc.close();
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            TextView tv = (TextView)MainActivity.this.findViewById(R.id.text_work);
+                            assert tv != null;
+                            tv.setText(ASN1Dump.dumpAsString(prim));
                             Toast.makeText(MainActivity.this, android.R.string.ok, Toast.LENGTH_SHORT).show();
                         }
                     });

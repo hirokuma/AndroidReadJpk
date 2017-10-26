@@ -2,4 +2,5 @@
     <string name="app_name">Read JPK PubKey</string>
     <string name="cannot_nfc">Cannot detect NFC Tag</string>
     <string name="fail_detect">Fail</string>
+    <string name="work_area">Touch your card</string>
 </resources>
